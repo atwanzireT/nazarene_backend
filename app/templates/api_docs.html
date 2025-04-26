@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Nazerene API Documentation</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--light);
+            opacity: 0.8;
+        }
+        
+        .api-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .api-header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .method {
+            background: white;
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        
+        .endpoint {
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        
+        .api-content {
+            padding: 1.5rem;
+        }
+        
+        .description {
+            margin-bottom: 1.5rem;
+        }
+        
+        h3 {
+            margin: 1.5rem 0 1rem;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .response-example {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .filter-options {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        .filter-option {
+            display: inline-block;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .api-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .method {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>The Nazerene API</h1>
+            <p class="subtitle">Documentation for the Alumni Association Management System</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">POST /api/account-application/</span>
+                <span class="method">Post</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>Submit a new account application. This is open to all potential alumni members.</p>
+                </div>
+                
+                <h3>Request Body</h3>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>full_first_name</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Applicant's first name</td>
+                    </tr>
+                    <tr>
+                        <td>full_surname</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Applicant's surname</td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Unique email address</td>
+                    </tr>
+                    <tr>
+                        <td>mobile_phone_1</td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Primary mobile number</td>
+                    </tr>
+                    <tr>
+                        <td>year_joined_jonahs</td>
+                        <td>integer</td>
+                        <td>Yes</td>
+                        <td>Year joined Jonahs</td>
+                    </tr>
+                    <tr>
+                        <td>year_left_jonahs</td>
+                        <td>integer</td>
+                        <td>Yes</td>
+                        <td>Year left Jonahs</td>
+                    </tr>
+                    <tr>
+                        <td>consent_given</td>
+                        <td>boolean</td>
+                        <td>Yes</td>
+                        <td>Must be true to submit</td>
+                    </tr>
+                </table>
+                
+                <h3>Response</h3>
+                <p>Success: 201 Created</p>
+                <div class="response-example">
+                    <pre>{
+    "message": "Application submitted successfully"
+}</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/users/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all users. Requires admin privileges.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?is_approved=true</code> - Filter by approval status</div>
+                    <div class="filter-option"><code>?role=ADMIN</code> - Filter by role</div>
+                    <div class="filter-option"><code>?search=john</code> - Search by name/email</div>
+                    <div class="filter-option"><code>?ordering=-date_joined</code> - Sort by date</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "username": "admin",
+        "full_name": "Admin User",
+        "email": "admin@example.com",
+        "phone_number": "+1234567890",
+        "is_approved": true,
+        "role": "ADMIN",
+        "role_display": "Admin",
+        "date_joined": "2023-01-01T00:00:00Z"
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/applications/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all account applications. Requires admin privileges.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?is_approved=true</code> - Filter by approval status</div>
+                    <div class="filter-option"><code>?year_joined_jonahs=2010</code> - Filter by year joined</div>
+                    <div class="filter-option"><code>?search=smith</code> - Search by name</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "full_first_name": "John",
+        "full_surname": "Doe",
+        "email": "john@example.com",
+        "mobile_phone_1": "+1234567890",
+        "year_joined_jonahs": 2010,
+        "year_left_jonahs": 2016,
+        "is_approved": false
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/projects/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all projects. Requires authentication.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?status=ongoing</code> - Filter by status</div>
+                    <div class="filter-option"><code>?active=true</code> - Show only active projects</div>
+                    <div class="filter-option"><code>?search=fundraiser</code> - Search projects</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "title": "Alumni Fundraiser",
+        "description": "Annual fundraising event",
+        "status": "ongoing",
+        "status_display": "Ongoing",
+        "progress": 45,
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "duration": 364,
+        "is_active": true,
+        "activities": [
+            {
+                "id": 1,
+                "title": "Kickoff Meeting",
+                "description": "Initial planning session",
+                "activity_date": "2023-01-15"
+            }
+        ]
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/activities/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all activities. Requires authentication.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?project=1</code> - Filter by project ID</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "title": "Kickoff Meeting",
+        "description": "Initial planning session",
+        "activity_date": "2023-01-15",
+        "project": 1,
+        "project_title": "Alumni Fundraiser"
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/events/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all events. Requires authentication.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?upcoming=true</code> - Show upcoming events</div>
+                    <div class="filter-option"><code>?past=true</code> - Show past events</div>
+                    <div class="filter-option"><code>?ordering=event_date</code> - Sort by date</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "title": "Alumni Reunion",
+        "description": "Annual alumni gathering",
+        "event_date": "2023-06-15T18:00:00Z",
+        "location": "School Campus",
+        "slots": 100,
+        "available_slots": 85,
+        "registered_count": 15,
+        "is_past": false,
+        "is_registered": true
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/registrations/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all event registrations for the current user. Requires authentication.</p>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "user": "john@example.com",
+        "event": 1,
+        "event_title": "Alumni Reunion",
+        "event_date": "2023-06-15T18:00:00Z",
+        "registered_at": "2023-05-01T10:30:00Z"
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section class="api-section">
+            <div class="api-header">
+                <span class="endpoint">GET /api/notifications/</span>
+                <span class="method">Get</span>
+            </div>
+            <div class="api-content">
+                <div class="description">
+                    <p>List all notifications for the current user. Requires authentication.</p>
+                </div>
+                
+                <div class="filter-options">
+                    <h4>Filter Options:</h4>
+                    <div class="filter-option"><code>?is_read=false</code> - Show only unread</div>
+                    <div class="filter-option"><code>?ordering=-created_at</code> - Sort by date</div>
+                </div>
+                
+                <h3>Response</h3>
+                <p>Success: 200 OK</p>
+                <div class="response-example">
+                    <pre>[
+    {
+        "id": 1,
+        "title": "New Event",
+        "message": "Alumni Reunion has been scheduled",
+        "is_read": false,
+        "created_at": "2023-05-01T10:30:00Z",
+        "time_since": "2 days ago"
+    }
+]</pre>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Jonahs Alumni Association API &copy; 2023</p>
+            <p>For support, contact: alumni-support@jonahs.edu</p>
+        </div>
+    </footer>
+</body>
+</html>

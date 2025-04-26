@@ -1,21 +1,29 @@
-from rest_framework.routers import DefaultRouter
 from django.urls import path, include
+from . import api_views
+from rest_framework.routers import DefaultRouter
 from .api_views import (
-    UserViewSet, AccountApplicationViewSet,
-    ProjectViewSet, ActivityViewSet,
-    EventViewSet, EventRegistrationViewSet,
-    NotificationViewSet
+    UserListView,
+    AccountApplicationListView,
+    ProjectListView,
+    ActivityListView,
+    EventListView,
+    EventRegistrationListView,
+    NotificationListView,
+    AccountApplicationAPIView
 )
 
-router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'applications', AccountApplicationViewSet)
-router.register(r'projects', ProjectViewSet)
-router.register(r'activities', ActivityViewSet)
-router.register(r'events', EventViewSet)
-router.register(r'registrations', EventRegistrationViewSet)
-router.register(r'notifications', NotificationViewSet)
-
 urlpatterns = [
-    path('', include(router.urls)),
+    # Docs
+    path('', api_views.index, name='api-docs'),
+    # List views
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('applications/', AccountApplicationListView.as_view(), name='application-list'),
+    path('projects/', ProjectListView.as_view(), name='project-list'),
+    path('activities/', ActivityListView.as_view(), name='activity-list'),
+    path('events/', EventListView.as_view(), name='event-list'),
+    path('registrations/', EventRegistrationListView.as_view(), name='eventregistration-list'),
+    path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    
+    # Special endpoints
+    path('account-application/', AccountApplicationAPIView.as_view(), name='account-application-api'),
 ]

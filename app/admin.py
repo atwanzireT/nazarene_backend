@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Project, Activity, Event, EventRegistration, Notification, AccountApplication
+from .models import User, Project, Activity, Event, EventRegistration, Notification, AccountApplication, UserActivity
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -15,3 +15,4 @@ admin.site.register(Event)
 admin.site.register(EventRegistration)
 admin.site.register(Notification)
 admin.site.register(AccountApplication)
+admin.site.register(UserActivity)

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card border-primary shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ application.full_first_name }} {{ application.full_surname }} - Account Application</h4>
+        </div>
+        <div class="card-body text-black">
+
+            <!-- Section: Personal Details -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Personal Details</h5>
+                <table class="table table-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <th>First Name</th><td>{{ application.full_first_name }}</td>
+                            <th>Middle Name</th><td>{{ application.full_middle_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Surname</th><td>{{ application.full_surname }}</td>
+                            <th>Other Names</th><td>{{ application.other_names }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date of Birth</th><td>{{ application.date_of_birth }}</td>
+                            <th>Gender</th><td>{{ application.gender }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nationality</th><td colspan="3">{{ application.nationality }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section: Contact Details -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Contact Details</h5>
+                <table class="table table-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <th>Mobile Phone 1</th><td>{{ application.mobile_phone_1 }}</td>
+                            <th>Mobile Phone 2</th><td>{{ application.mobile_phone_2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th><td colspan="3">{{ application.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Home Phone 1</th><td>{{ application.home_phone_1 }}</td>
+                            <th>Home Phone 2</th><td>{{ application.home_phone_2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Current Location</th><td>{{ application.current_location }}</td>
+                            <th>Permanent Address</th><td>{{ application.permanent_home_address }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section: Academic Details -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Academic Details</h5>
+                <table class="table table-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <th>Year Joined</th><td>{{ application.year_joined_jonahs }}</td>
+                            <th>Year Left</th><td>{{ application.year_left_jonahs }}</td>
+                        </tr>
+                        <tr>
+                            <th>UCE Year</th><td>{{ application.uce_class_year }}</td>
+                            <th>UACE Year</th><td>{{ application.uace_class_year }}</td>
+                        </tr>
+                        <tr>
+                            <th>House</th><td>{{ application.house }}</td>
+                            <th>Classes Attended</th><td>{{ application.classes_attended }}</td>
+                        </tr>
+                        <tr>
+                            <th>Sat UCE</th><td>{{ application.sat_uce|yesno:"Yes,No" }}</td>
+                            <th>Sat UACE</th><td>{{ application.sat_uace|yesno:"Yes,No" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section: Association Interests -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Association Interests</h5>
+                <ul class="mb-0">
+                    {% if application.mentorship_career_guidance %}<li>Mentorship & Career Guidance</li>{% endif %}
+                    {% if application.skill_sharing %}<li>Skill Sharing</li>{% endif %}
+                    {% if application.networking %}<li>Networking</li>{% endif %}
+                    {% if application.fundraisers %}<li>Fundraisers</li>{% endif %}
+                    {% if application.event_planning %}<li>Event Planning</li>{% endif %}
+                    {% if application.cohort_mobilisation %}<li>Cohort Mobilisation</li>{% endif %}
+                    {% if application.volunteering %}<li>Volunteering</li>{% endif %}
+                </ul>
+            </div>
+
+            <!-- Section: Areas of Contribution -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Areas of Contribution</h5>
+                <ul class="mb-0">
+                    {% if application.financial_support %}<li>Financial Support</li>{% endif %}
+                    {% if application.charitable_outreach_programs %}<li>Charitable Outreach Programs</li>{% endif %}
+                    {% if application.alumni_sports_league %}<li>Alumni Sports League</li>{% endif %}
+                    {% if application.alumni_dinner %}<li>Alumni Dinner</li>{% endif %}
+                    {% if application.events_at_school %}<li>Events at School</li>{% endif %}
+                    {% if application.all_get_together_events %}<li>All Get-Together Events</li>{% endif %}
+                </ul>
+            </div>
+
+            <!-- Section: Consent -->
+            <div class="mb-4">
+                <h5 class="border-bottom border-primary pb-2">Consent</h5>
+                <p><strong>Consent Given:</strong> {{ application.consent_given|yesno:"Yes,No" }}</p>
+            </div>
+
+            <!-- Section: Timestamps -->
+            <div class="text-muted small">
+                <p class="mb-1">Created on: {{ application.created_at }}</p>
+                <p>Last updated: {{ application.updated_at }}</p>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="card-footer bg-white text-end">
+            <a href="{% url 'approve_application' application.id %}" class="btn btn-primary">Create Application</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
