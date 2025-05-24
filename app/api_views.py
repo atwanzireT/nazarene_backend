@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -7,19 +6,14 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.shortcuts import render
+from .models import *
+from .serializers import *
 
-from .models import (
-    AccountApplication, Project, Activity,
-    Event, EventRegistration, Notification, User
-)
-from .serializers import (
-    AccountApplicationSerializer, ProjectSerializer,
-    ActivitySerializer, EventSerializer,
-    EventRegistrationSerializer, NotificationSerializer,
-    UserSerializer
-)
-
-class UserListView(generics.ListAPIView):
+# --------------------------------------------
+# User (Admin only)
+# --------------------------------------------
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -30,7 +24,10 @@ class UserListView(generics.ListAPIView):
     ordering = ['-date_joined']
 
 
-class AccountApplicationListView(generics.ListAPIView):
+# --------------------------------------------
+# Account Application (Public POST)
+# --------------------------------------------
+class AccountApplicationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AccountApplication.objects.all()
     serializer_class = AccountApplicationSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -39,79 +36,130 @@ class AccountApplicationListView(generics.ListAPIView):
     search_fields = ['full_first_name', 'full_surname', 'email']
 
 
-class ProjectListView(generics.ListAPIView):
+class AccountApplicationAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = AccountApplicationSerializer(data=request.data)
+        if serializer.is_valid():
+            app = serializer.save()
+
+            send_mail(
+                subject='New Account Application Submitted',
+                message=(
+                    f'New application from {app.full_first_name} {app.full_surname}\n'
+                    f'Email: {app.email}\nPhone: {app.mobile_phone_1}\n'
+                    f'Year Joined: {app.year_joined_jonahs}'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMIN_EMAIL],
+                fail_silently=False
+            )
+
+            send_mail(
+                subject='Application Received',
+                message=(
+                    f'Dear {app.full_first_name},\n\n'
+                    f'Thank you for submitting your application. We will review it shortly.\n\n'
+                    f'Regards,\nThe Alumni Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[app.email],
+                fail_silently=False
+            )
+
+            return Response({'message': 'Application submitted successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# --------------------------------------------
+# Projects (Public Read)
+# --------------------------------------------
+class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['status']
+    filterset_fields = ['status', 'is_featured']
     search_fields = ['title', 'description']
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        status = self.request.query_params.get('status', None)
-        
-        # Filter for active projects
         if self.request.query_params.get('active') == 'true':
             from django.utils import timezone
             today = timezone.now().date()
-            queryset = queryset.filter(
-                start_date__lte=today,
-                end_date__gte=today
-            )
-        
+            queryset = queryset.filter(start_date__lte=today, end_date__gte=today)
         return queryset
 
 
-class ActivityListView(generics.ListAPIView):
+class ProjectImageViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ProjectImage.objects.all()
+    serializer_class = ProjectImageSerializer
+    permission_classes = [permissions.AllowAny]
+
+# --------------------------------------------
+# Activities (Public Read)
+# --------------------------------------------
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ActivitySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
 
     def get_queryset(self):
-        queryset = Activity.objects.all()
-        project_id = self.request.query_params.get('project', None)
-        
-        if project_id:
-            queryset = queryset.filter(project_id=project_id)
-        
-        return queryset.order_by('-activity_date')
+        return Activity.objects.all().order_by('-activity_date')
 
 
-class EventListView(generics.ListAPIView):
+class ActivityImageViewSet(viewsets.ModelViewSet):
+    queryset = ActivityImage.objects.all()
+    serializer_class = ActivityImageSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+# --------------------------------------------
+# Events (Public Read)
+# --------------------------------------------
+class EventViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['event_date', 'title']
     ordering = ['-event_date']
 
     def get_queryset(self):
         queryset = Event.objects.all()
-        
-        # Filter for upcoming events
+        from django.utils import timezone
         if self.request.query_params.get('upcoming') == 'true':
-            from django.utils import timezone
             queryset = queryset.filter(event_date__gte=timezone.now())
-        
-        # Filter for past events
-        if self.request.query_params.get('past') == 'true':
-            from django.utils import timezone
+        elif self.request.query_params.get('past') == 'true':
             queryset = queryset.filter(event_date__lt=timezone.now())
-        
         return queryset
 
 
-class EventRegistrationListView(generics.ListAPIView):
+class EventImageViewSet(viewsets.ModelViewSet):
+    queryset = EventImage.objects.all()
+    serializer_class = EventImageSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+# --------------------------------------------
+# Event Registrations (Authenticated only)
+# --------------------------------------------
+class EventRegistrationViewSet(viewsets.ModelViewSet):
     serializer_class = EventRegistrationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Users can only see their own registrations
         return EventRegistration.objects.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-class NotificationListView(generics.ListAPIView):
+
+# --------------------------------------------
+# Notifications (Authenticated only)
+# --------------------------------------------
+class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -120,64 +168,75 @@ class NotificationListView(generics.ListAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        # Users can only see their own notifications
         return Notification.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['post'])
     def mark_all_as_read(self, request):
-        updated = Notification.objects.filter(
-            user=request.user,
-            is_read=False
-        ).update(is_read=True)
-        
-        return Response({
-            'status': 'success',
-            'message': f'{updated} notifications marked as read'
-        })
+        count = Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+        return Response({'message': f'{count} notifications marked as read'})
 
 
-class AccountApplicationAPIView(APIView):
-    # permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        serializer = AccountApplicationSerializer(data=request.data)
-        if serializer.is_valid():
-            app = serializer.save()
-            
-            # Send email to admin
-            send_mail(
-                'New Account Application Submitted',
-                f'New application from {app.full_first_name} {app.full_surname}\n'
-                f'Email: {app.email}\n'
-                f'Phone: {app.mobile_phone_1}\n'
-                f'Year Joined: {app.year_joined_jonahs}',
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.ADMIN_EMAIL],
-                fail_silently=False,
-            )
-            
-            # Optional: Send confirmation email to applicant
-            send_mail(
-                'Application Received',
-                f'Dear {app.full_first_name},\n\n'
-                f'Thank you for submitting your application to the Jonahs Alumni Association. '
-                f'We have received your details and will review them shortly.\n\n'
-                f'You will receive another email once your application has been processed.\n\n'
-                f'Best regards,\n'
-                f'The Alumni Team',
-                settings.DEFAULT_FROM_EMAIL,
-                [app.email],
-                fail_silently=False,
-            )
-            
-            return Response(
-                {'message': 'Application submitted successfully'}, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-
-# Api Docs
+# --------------------------------------------
+# Docs
+# --------------------------------------------
 def index(request):
     return render(request, 'api_docs.html')
+
+
+class ExecutiveTeamMemberViewSet(viewsets.ModelViewSet):
+    serializer_class = ExecutiveTeamMemberSerializer
+
+    def get_queryset(self):
+        queryset = ExecutiveTeamMember.objects.all().order_by('rank')
+        active_param = self.request.query_params.get('active')
+
+        if active_param is not None:
+            if active_param.lower() == 'true':
+                queryset = queryset.filter(active=True)
+            elif active_param.lower() == 'false':
+                queryset = queryset.filter(active=False)
+
+        return queryset
+        
+
+class ContactMessageViewSet(viewsets.ModelViewSet):
+    queryset = ContactMessage.objects.all().order_by('-submitted_at')
+    serializer_class = ContactMessageSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            app = serializer.save()
+
+            # Email to Admin
+            send_mail(
+                subject='New Contact Message Submitted',
+                message=(
+                    f'New message from {app.name}\n'
+                    f'Email: {app.email}\n'
+                    f'Category: {app.get_category_display()}\n'
+                    f'Subject: {app.subject or "N/A"}\n\n'
+                    f'Message:\n{app.message}'
+                ),
+                from_email=app.email,
+                recipient_list=[settings.ADMIN_EMAIL],
+                fail_silently=False,
+            )
+
+            # Acknowledgment to User
+            send_mail(
+                subject='We’ve Received Your Message',
+                message=(
+                    f'Dear {app.name},\n\n'
+                    f'Thank you for contacting us. We’ve received your message and will respond as soon as possible.\n\n'
+                    f'Best regards,\nAlumni Relations Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[app.email],
+                fail_silently=False,
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

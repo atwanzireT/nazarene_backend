@@ -9,7 +9,7 @@ from .models import (
     EventRegistration,
     Notification
 )
-
+from .models import AccountApplication
 
 class BootstrapFormMixin:
     def __init__(self, *args, **kwargs):
@@ -21,15 +21,13 @@ class BootstrapFormMixin:
             field.widget.attrs.update({'class': classes})
 
 
-# Custom User Registration Form
 class UserForm(BootstrapFormMixin, UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'full_name', 'email', 'phone_number', 'password1', 'password2']
 
 
-# Account Application Form
-class AccountApplicationForm(forms.ModelForm):
+class AccountApplicationForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = AccountApplication
         exclude = ['created_at', 'updated_at']
@@ -37,48 +35,59 @@ class AccountApplicationForm(forms.ModelForm):
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }
 
-# Project Form
+
 class ProjectForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'description', 'status', 'progress', 'start_date', 'end_date', 'cover_image']
-        
+        fields = [
+            'title', 'description', 'status', 'progress',
+            'start_date', 'end_date', 'budget', 'raised_amount',
+            'location', 'cover_image', 'is_featured'
+        ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
 
-# Activity Form
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Activity
-        fields = ['project', 'title', 'description', 'activity_date', 'cover_image']
-        
+        fields = ['project', 'title', 'description', 'activity_date', 'status', 'location', 'cover_image', 'notes']
         widgets = {
-            'event_date': forms.DateInput(attrs={'type': 'date'}),
+            'activity_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-# Event Form
+
 class EventForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'event_date', 'location', 'slots', 'cover_image']
-        
+        fields = [
+            'title', 'description', 'event_date', 'location', 'slots',
+            'organizer', 'contact_email', 'contact_phone', 'status',
+            'is_open', 'cover_image'
+        ]
         widgets = {
-            'event_date': forms.DateInput(attrs={'type': 'date'}),
+            'event_date': forms.DateInput(attrs={'type': 'datetime-local'}),
         }
 
 
-# Event Registration Form
 class EventRegistrationForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = EventRegistration
         fields = ['event']
 
 
-# Notification Form
 class NotificationForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Notification
         fields = ['user', 'title', 'message', 'is_read']
+
+
+class AccountApplicationForm(forms.ModelForm):
+    class Meta:
+        model = AccountApplication
+        fields = '__all__'
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }

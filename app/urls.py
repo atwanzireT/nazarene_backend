@@ -10,6 +10,7 @@ urlpatterns = [
     path('login-activities/', views.user_login_activities, name='login_activities'),
 
     # Account Applications
+    path('account-application/create/', views.account_application_create, name='account_application_create'),
     path('account-applications/', views.account_application_list, name='account_application_list'),
     path('account-application/<int:application_id>/', views.account_application_detail, name='account_application_detail'),
     path('apply-account/', views.apply_account, name='apply_account'),

@@ -294,3 +294,44 @@ def approve_account_application(request, application_id):
 def user_login_activities(request):
     activities = UserActivity.objects.filter(activity='login').order_by('-timestamp')
     return render(request, 'login_activities.html', {'activities': activities})
+
+
+
+def account_application_create(request):
+    if request.method == 'POST':
+        form = AccountApplicationForm(request.POST)
+        if form.is_valid():
+            app = form.save()
+
+            # Admin notification email
+            send_mail(
+                subject='New Account Application Submitted',
+                message=(
+                    f'New application from {app.full_first_name} {app.full_surname}\n'
+                    f'Email: {app.email}\nPhone: {app.mobile_phone_1}\n'
+                    f'Year Joined: {app.year_joined_jonahs}'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMIN_EMAIL],
+                fail_silently=False
+            )
+
+            # Applicant confirmation email
+            send_mail(
+                subject='Application Received',
+                message=(
+                    f'Dear {app.full_first_name},\n\n'
+                    f'Thank you for submitting your application. We will review it shortly.\n\n'
+                    f'Regards,\nThe Alumni Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[app.email],
+                fail_silently=False
+            )
+
+            messages.success(request, "Application submitted successfully!")
+            return redirect('account-application-success')
+    else:
+        form = AccountApplicationForm()
+    
+    return render(request, 'application_form.html', {'form': form})
