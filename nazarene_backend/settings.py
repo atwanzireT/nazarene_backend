@@ -87,10 +87,15 @@ WSGI_APPLICATION = 'nazarene_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nazarene',
+        'USER': 'postgres',
+        'PASSWORD': 'atwanzire',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
 
 
 # Password validation
@@ -143,7 +148,7 @@ AUTH_USER_MODEL = 'app.User'
 
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 
 # Email settings

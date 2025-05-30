@@ -7,9 +7,30 @@ from .models import (
     Activity,
     Event,
     EventRegistration,
-    Notification
+    Notification,
+    ExecutiveTeamMember
 )
 from .models import AccountApplication
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+
+class EmailLoginForm(AuthenticationForm):
+    username = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email',
+            'autofocus': True
+        })
+    )
+    password = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your password'
+        })
+    )
 
 class BootstrapFormMixin:
     def __init__(self, *args, **kwargs):
@@ -90,4 +111,25 @@ class AccountApplicationForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+
+class ExecutiveTeamMemberForm(forms.ModelForm):
+    class Meta:
+        model = ExecutiveTeamMember
+        fields = [
+            'position', 'name', 'email', 'phone',
+            'term_start', 'term_end', 'image_url',
+            'rank', 'active'
+        ]
+        widgets = {
+            'position': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'term_start': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'term_end': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'image_url': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'rank': forms.NumberInput(attrs={'class': 'form-control'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

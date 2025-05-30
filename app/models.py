@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 # Custom User Model
 class User(AbstractUser):
@@ -32,6 +33,13 @@ class User(AbstractUser):
 # Account Application
 class AccountApplication(models.Model):
     # Personal Details
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='account_application',
+        null=True,
+        blank=True
+    )
     full_first_name = models.CharField(max_length=100)
     full_middle_name = models.CharField(max_length=100, blank=True, null=True)
     full_surname = models.CharField(max_length=100)
@@ -87,6 +95,7 @@ class AccountApplication(models.Model):
 
     def __str__(self):
         return f"{self.full_first_name} {self.full_surname} - {self.email}"
+    
 # -------------------------
 # Projects and Activities
 # -------------------------

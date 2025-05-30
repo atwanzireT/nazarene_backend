@@ -5,9 +5,9 @@ from .models import *
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
-        (None, {'fields': ('full_name', 'phone_number', 'is_approved')}),
+        (None, {'fields': ('full_name', 'phone_number', 'role', 'is_approved')}),
     )
-    list_display = ('username', 'full_name', 'email', 'is_approved')
+    list_display = ('username', 'full_name', 'email', 'role', 'is_approved')
 
 admin.site.register(Project)
 admin.site.register(Activity)

@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .views import user_login
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -31,4 +33,12 @@ urlpatterns = [
     # Notifications
     path('notifications/', views.notification_list, name='notification_list'),
     path('create-notification/', views.create_notification, name='create_notification'),
+    
+    # Auth
+    path('login/', user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    
+    # Staff
+    path('executive-team/', views.executive_team_list, name='executive_team_list'),
+    path('executive-team/create/', views.executive_team_create, name='executive_team_create'),
 ]

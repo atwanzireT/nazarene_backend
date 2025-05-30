@@ -1,26 +1,54 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import (
-    UserForm,
-    AccountApplicationForm,
-    ProjectForm,
-    ActivityForm,
-    EventForm,
-    EventRegistrationForm,
-    NotificationForm
-)
+from .forms import *
 from .models import *
 from django.core.mail import send_mail, send_mass_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import EmailLoginForm
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib import messages
 
 User = get_user_model()
 
-
 def admin_required(view_func):
-    return user_passes_test(lambda u: u.is_active and u.is_staff)(view_func)
+    return login_required(user_passes_test(lambda u: u.role == 'ADMIN', login_url='login')(view_func))
+
+# views.py
+def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = EmailLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            if user.role == user.Role.ADMIN:
+                if user.is_approved:
+                    login(request, user)
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Your account is not approved yet.')
+            else:
+                messages.error(request, 'Only admin accounts are allowed to log in here.')
+        else:
+            messages.error(request, 'Invalid login credentials.')
+    else:
+        form = EmailLoginForm()
+
+    return render(request, 'login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('login')
+
 
 
 def notify_all_users(subject, message, fail_silently=False):
@@ -238,7 +266,6 @@ def notification_list(request):
     return render(request, 'notification_list.html', {'notifications': notifications})
 
 
-# Account Creation
 @admin_required
 def approve_account_application(request, application_id):
     application = get_object_or_404(AccountApplication, pk=application_id)
@@ -266,7 +293,8 @@ def approve_account_application(request, application_id):
     user.set_password(password)
     user.save()
 
-    # Mark application as approved
+    # Link application to the new user
+    application.user = user
     application.is_approved = True
     application.save()
 
@@ -335,3 +363,21 @@ def account_application_create(request):
         form = AccountApplicationForm()
     
     return render(request, 'application_form.html', {'form': form})
+
+
+@admin_required
+def executive_team_list(request):
+    members = ExecutiveTeamMember.objects.all()
+    return render(request, 'executive_team_list.html', {'members': members})
+
+@admin_required
+def executive_team_create(request):
+    if request.method == 'POST':
+        form = ExecutiveTeamMemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Executive team member added successfully.')
+            return redirect('executive_team_list')
+    else:
+        form = ExecutiveTeamMemberForm()
+    return render(request, 'executive_team_create.html', {'form': form})

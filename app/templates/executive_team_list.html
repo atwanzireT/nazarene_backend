@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Executive Team</h2>
+<a href="{% url 'executive_team_create' %}" class="btn btn-primary mb-3">Add Member</a>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Term</th>
+      <th>Active</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for member in members %}
+    <tr>
+      <td>{{ member.rank }}</td>
+      <td>{{ member.name }}</td>
+      <td>{{ member.position }}</td>
+      <td>{{ member.email }}</td>
+      <td>{{ member.phone }}</td>
+      <td>{{ member.term_start }} - {{ member.term_end }}</td>
+      <td>{{ member.active|yesno:"Yes,No" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

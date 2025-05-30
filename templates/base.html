@@ -7,19 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Nazerene</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'assets/images/logos/favicon.png' %}" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}" />
 </head>
 
 <body>
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
-    data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
 
     <!-- Sidebar Start -->
     <aside class="left-sidebar">
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="{% url 'home' %}" class="text-nowrap logo-img">
-            <!-- <img src="{% static 'assets/images/logos/dark-logo.svg' %}" width="180" alt="Logo" /> -->
+            <span
+              style="font-weight:bold; font-size:1.3rem; color:#2a3547; letter-spacing:1px; vertical-align:middle;">The
+              Nazarene</span>
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
@@ -67,15 +70,28 @@
                 <span class="hide-menu">Events</span>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'activity_list' %}">
+                <span><i class="fas fa-tasks"></i></span>
+                <span class="hide-menu">Activities</span>
+              </a>
+            </li>
+
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'executive_team_list' %}">
+                <span><i class="ti ti-users"></i></span>
+                <span class="hide-menu">Executive Team</span>
+              </a>
+            </li>
 
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Account</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{% url 'register_user' %}">
-                <span><i class="ti ti-user-plus"></i></span>
-                <span class="hide-menu">Register</span>
+              <a class="sidebar-link" href="/logout/">
+              <span><i class="ti ti-logout"></i></span>
+              <span class="hide-menu">Logout</span>
               </a>
             </li>
           </ul>
@@ -111,13 +127,16 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
                     <a href="#" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-user fs-6"></i><p class="mb-0 fs-3">My Profile</p>
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
                     </a>
                     <a href="#" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-mail fs-6"></i><p class="mb-0 fs-3">My Account</p>
+                      <i class="ti ti-mail fs-6"></i>
+                      <p class="mb-0 fs-3">My Account</p>
                     </a>
                     <a href="#" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-list-check fs-6"></i><p class="mb-0 fs-3">My Task</p>
+                      <i class="ti ti-list-check fs-6"></i>
+                      <p class="mb-0 fs-3">My Task</p>
                     </a>
                     <a href="{% url 'home' %}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
