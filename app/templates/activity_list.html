@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-4">Activities</h5>
+                    <a href="{% url 'create_activity' %}" class="btn btn-primary"> <!-- Update URL name accordingly -->
+                        <i class="bi bi-plus-circle me-1"></i> Add Activity
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table text-nowrap mb-0 align-middle">
+                        <thead class="text-dark fs-4">
+                            <tr>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">ID</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Project</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Title</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Date</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Location</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Status</h6>
+                                </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Created</h6>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">{{ activity.id }}</h6>
+                                </td>
+                                <td class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-1">{{ activity.project.title }}</h6>
+                                </td>
+                                <td class="border-bottom-0">
+                                    <a href="#">
+                                        {{ activity.title|truncatechars:30 }}
+                                    </a>
+                                </td>
+                                <td class="border-bottom-0">
+                                    {{ activity.activity_date|date:"Y-m-d" }}
+                                </td>
+                                <td class="border-bottom-0">
+                                    {{ activity.location|default:"-" }}
+                                </td>
+                                <td class="border-bottom-0">
+                                    <span class="badge rounded-3 fw-semibold 
+                                        {% if activity.status == 'completed' %}bg-success
+                                        {% elif activity.status == 'cancelled' %}bg-danger
+                                        {% elif activity.status == 'ongoing' %}bg-primary
+                                        {% elif activity.status == 'postponed' %}bg-warning
+                                        {% elif activity.status == 'archived' %}bg-secondary
+                                        {% else %}bg-info{% endif %}">
+                                        {{ activity.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="border-bottom-0">
+                                    <h6 class="fw-normal mb-0">{{ activity.created|date:"Y-m-d H:i" }}</h6>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No activities found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

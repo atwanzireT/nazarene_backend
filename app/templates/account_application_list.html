@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-semibold mb-4">Account Applications</h5>
+                <div class="table-responsive">
+                    <table class="table text-nowrap mb-0 align-middle">
+                        <thead class="text-dark fs-4">
+                            <tr>
+                                <th><h6 class="fw-semibold mb-0">Full Name</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Gender</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Phone</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Email</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Nationality</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Date Applied</h6></th>
+                                <th><h6 class="fw-semibold mb-0">Action</h6></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td>
+                                    {{ app.full_first_name }}
+                                    {% if app.full_middle_name %} {{ app.full_middle_name }}{% endif %}
+                                    {{ app.full_surname }}
+                                </td>
+                                <td>{{ app.gender }}</td>
+                                <td>{{ app.mobile_phone_1 }}</td>
+                                <td>{{ app.email }}</td>
+                                <td>{{ app.nationality }}</td>                    
+                                <td>{{ app.created_at|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    <a href="/account-application/{{ app.id }}/" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="13" class="text-center">No applications found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

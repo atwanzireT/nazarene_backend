@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jonahs Alumni API Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; margin: 0; color: #333; }
+    header { background: #2c3e50; color: white; padding: 2rem; text-align: center; }
+    header h1 { margin: 0; font-size: 2rem; }
+    .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    .section { background: white; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .section-header { background: #3498db; color: white; padding: 1rem; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .method { background: white; color: #3498db; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+    .content { padding: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f3f4f6; }
+    pre { background: #f1f5f9; padding: 1rem; border-left: 4px solid #3498db; overflow-x: auto; margin: 1rem 0; border-radius: 4px; }
+    code { background: #eef2f7; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    footer { text-align: center; font-size: 0.9rem; color: #888; padding: 2rem 0; }
+    a.endpoint-link { color: #1e40af; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jonahs Alumni API Documentation</h1>
+    <p>Comprehensive reference for all major and minor endpoints.</p>
+  </header>
+  <main class="container">
+    <div class="section">
+      <div class="section-header"><a href="/api/users/" class="endpoint-link">GET /api/users/</a><span class="method">GET</span></div>
+      <div class="content"><p>Admin only: View all users. Filter by role, approval, search, and order.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/account-application/" class="endpoint-link">POST /api/account-application/</a><span class="method">POST</span></div>
+      <div class="content"><p>Submit an alumni account application with full profile details.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/applications/" class="endpoint-link">GET /api/applications/</a><span class="method">GET</span></div>
+      <div class="content"><p>Admin only: View submitted applications with filters (approved, year joined/left).</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/projects/" class="endpoint-link">GET /api/projects/</a><span class="method">GET</span></div>
+      <div class="content"><p>View all projects with progress, activities, dates, and active filters.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/project-images/" class="endpoint-link">GET /api/project-images/</a><span class="method">GET</span></div>
+      <div class="content"><p>List images associated with projects.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/activities/" class="endpoint-link">GET /api/activities/</a><span class="method">GET</span></div>
+      <div class="content"><p>View project-related activities, filterable by project ID.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/activity-images/" class="endpoint-link">GET /api/activity-images/</a><span class="method">GET</span></div>
+      <div class="content"><p>Fetch activity gallery photos with captions.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/events/" class="endpoint-link">GET /api/events/</a><span class="method">GET</span></div>
+      <div class="content"><p>List all events, with upcoming/past filters and participation tracking.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/event-images/" class="endpoint-link">GET /api/event-images/</a><span class="method">GET</span></div>
+      <div class="content"><p>Get associated images for each event.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/registrations/" class="endpoint-link">POST /api/registrations/</a><span class="method">POST</span></div>
+      <div class="content"><p>Register authenticated user for an event. Prevent duplicate or expired registrations.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/registrations/" class="endpoint-link">GET /api/registrations/</a><span class="method">GET</span></div>
+      <div class="content"><p>Get list of registrations for current authenticated user.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><a href="/api/notifications/" class="endpoint-link">GET /api/notifications/</a><span class="method">GET</span></div>
+      <div class="content"><p>Fetch user notifications with read status and time ago metadata.</p></div>
+    </div>
+  </main>
+  <footer>
+    <p>Jonahs Alumni &copy; 2025. All rights reserved.</p>
+  </footer>
+</body>
+</html>

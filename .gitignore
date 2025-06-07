@@ -1,0 +1,26 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Django migration files (but keep __init__.py)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Environment variables
+.env
+*.env
+
+# SQLite database
+*.sqlite3
+
+# Static and media (optional)
+staticfiles/
+media/
+
+# Log files
+*.log
