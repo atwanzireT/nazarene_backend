@@ -17,6 +17,7 @@ urlpatterns = [
     path('account-application/<int:application_id>/', views.account_application_detail, name='account_application_detail'),
     path('apply-account/', views.apply_account, name='apply_account'),
     path('applications/<int:application_id>/approve/', views.approve_account_application, name='approve_application'),
+    path('account-applications/success/', views.account_application_success, name='account-application-success'),
 
     # Projects and Activities
     path('projects/', views.project_list, name='project_list'),
@@ -41,4 +42,9 @@ urlpatterns = [
     # Staff
     path('executive-team/', views.executive_team_list, name='executive_team_list'),
     path('executive-team/create/', views.executive_team_create, name='executive_team_create'),
+    
+    # Images
+    path('projects/<int:project_id>/add-image/', views.add_project_image, name='add_project_image'),
+    path('events/<int:event_id>/add-image/', views.add_event_image, name='add_event_image'),
+    path('activities/<int:activity_id>/add-image/', views.add_activity_image, name='add_activity_image'),
 ]

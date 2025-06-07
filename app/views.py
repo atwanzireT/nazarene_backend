@@ -284,55 +284,6 @@ def user_login_activities(request):
     return render(request, 'login_activities.html', {'activities': activities})
 
 
-def account_application_create(request):
-    if request.method == 'POST':
-        form = AccountApplicationForm(request.POST)
-        if form.is_valid():
-            app = form.save()
-
-            sg = SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-
-            try:
-                # Admin notification email
-                admin_email = Mail(
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to_emails=settings.ADMIN_EMAIL,
-                    subject='New Account Application Submitted',
-                    plain_text_content=(
-                        f'New application from {app.full_first_name} {app.full_surname}\n'
-                        f'Email: {app.email}\nPhone: {app.mobile_phone_1}\n'
-                        f'Year Joined: {app.year_joined_jonahs}'
-                    )
-                )
-                sg.send(admin_email)
-
-                # Applicant confirmation email
-                applicant_email = Mail(
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to_emails=app.email,
-                    subject='Application Received',
-                    plain_text_content=(
-                        f'Dear {app.full_first_name},\n\n'
-                        f'Thank you for submitting your application. We will review it shortly.\n\n'
-                        f'Regards,\nThe Alumni Team'
-                    )
-                )
-                sg.send(applicant_email)
-
-                messages.success(request, "Application submitted successfully!")
-                return redirect('account-application-success')
-
-            except Exception as e:
-                messages.warning(request, f"Application saved, but email failed to send: {e}")
-                return redirect('account-application-success')
-
-    else:
-        form = AccountApplicationForm()
-
-    return render(request, 'application_form.html', {'form': form})
-
-
-
 @admin_required
 def executive_team_list(request):
     members = ExecutiveTeamMember.objects.all()
@@ -416,3 +367,110 @@ def approve_account_application(request, application_id):
 
     return redirect('account_application_list')
 
+# Image upload view
+@admin_required
+def add_project_image(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+
+    if request.method == 'POST':
+        form = ProjectImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            project_image = form.save(commit=False)
+            project_image.project = project
+            project_image.save()
+            return redirect('project_list')
+    else:
+        form = ProjectImageForm()
+
+    return render(request, 'add_project_image.html', {'form': form, 'project': project})
+
+
+def add_event_image(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        form = EventImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            event_image = form.save(commit=False)
+            event_image.event = event
+            event_image.save()
+            return redirect('event_list') 
+    else:
+        form = EventImageForm()
+    return render(request, 'add_event_image.html', {'form': form, 'event': event})
+
+
+def add_activity_image(request, activity_id):
+    activity = get_object_or_404(Activity, id=activity_id)
+    if request.method == 'POST':
+        form = ActivityImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            activity_image = form.save(commit=False)
+            activity_image.activity = activity
+            activity_image.save()
+            return redirect('activity_list') 
+    else:
+        form = ActivityImageForm()
+    return render(request, 'add_activity_image.html', {'form': form, 'activity': activity})
+
+
+
+
+def account_application_create(request):
+    if request.method == 'POST':
+        form = AccountApplicationForm(request.POST)
+        
+        if form.is_valid():
+            try:
+                app = form.save()
+
+                # Send emails
+                sg = SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+
+                # Admin notification email
+                admin_email = Mail(
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to_emails=settings.ADMIN_EMAIL,
+                    subject='New Account Application Submitted',
+                    plain_text_content=(
+                        f'New application from {app.full_first_name} {app.full_surname}\n'
+                        f'Email: {app.email}\nPhone: {app.mobile_phone_1}\n'
+                        f'Year Joined: {app.year_joined_jonahs}\n'
+                        f'House: {app.house}\n'
+                        f'Classes Attended: {app.classes_attended}'
+                    )
+                )
+                sg.send(admin_email)
+
+                # Applicant confirmation email
+                applicant_email = Mail(
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to_emails=app.email,
+                    subject='Application Received - The Nazarene Alumni Association',
+                    plain_text_content=(
+                        f'Dear {app.full_first_name},\n\n'
+                        f'Thank you for submitting your application to The Nazarene Alumni Association. '
+                        f'We have received your application and will review it shortly.\n\n'
+                        f'You will be contacted once your application has been processed.\n\n'
+                        f'Best regards,\nThe Nazarene Alumni Association'
+                    )
+                )
+                sg.send(applicant_email)
+
+                messages.success(request, "Application submitted successfully! You will receive a confirmation email shortly.")
+                return redirect('account-application-success')
+
+            except Exception as e:
+                print(f"Error processing application: {e}")  # Log the error
+                messages.warning(request, f"Application saved, but there was an issue with email notifications. We will contact you soon.")
+                return redirect('account-application-success')
+        else:
+            # Form has validation errors
+            messages.error(request, "Please correct the errors below and try again.")
+            print("Form errors:", form.errors)  # Debug print
+    else:
+        form = AccountApplicationForm()
+
+    return render(request, 'application_form.html', {'form': form})
+
+def account_application_success(request):
+    return render(request, 'application_success.html')

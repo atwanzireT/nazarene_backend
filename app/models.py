@@ -145,6 +145,9 @@ class ProjectImage(models.Model):
     image = models.ImageField(upload_to='project_gallery/')
     caption = models.CharField(max_length=200, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.project.title} - {self.caption or 'No Caption'}"
 
 
 class Activity(models.Model):
@@ -176,6 +179,9 @@ class ActivityImage(models.Model):
     image = models.ImageField(upload_to='activity_gallery/')
     caption = models.CharField(max_length=200, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.activity.title} - {self.caption or 'No Caption'}"
 
 
 # -------------------------
@@ -214,6 +220,9 @@ class EventImage(models.Model):
     image = models.ImageField(upload_to='event_gallery/')
     caption = models.CharField(max_length=200, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.event.title} - {self.caption or 'No Caption'}"
 
 
 class EventRegistration(models.Model):

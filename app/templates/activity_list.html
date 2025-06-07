@@ -36,6 +36,9 @@
                                 <th class="border-bottom-0">
                                     <h6 class="fw-semibold mb-0">Created</h6>
                                 </th>
+                                <th class="border-bottom-0">
+                                    <h6 class="fw-semibold mb-0">Action</h6>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,6 +74,13 @@
                                 </td>
                                 <td class="border-bottom-0">
                                     <h6 class="fw-normal mb-0">{{ activity.created|date:"Y-m-d H:i" }}</h6>
+                                </td>
+                                  <td class="border-bottom-0">
+                                    <div class="d-flex gap-2">
+                                        <a href="/projects/{{activity.id}}/add-image/" class="btn btn-primary">
+                                            <i class="bi bi-plus"></i> Add Images
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}
