@@ -20,5 +20,6 @@ router.register('contact-messages', api_views.ContactMessageViewSet, basename='c
 
 urlpatterns = [
     path('account-application/', api_views.AccountApplicationAPIView.as_view(), name='account-application-api'),
+    path('account-applications/birthdays/', api_views.BirthdayFilterView.as_view(), name='birthday-filter'),
     path('', include(router.urls)),
 ]

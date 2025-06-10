@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleUCEChange() {
             if (uceYesRadio && uceYesRadio.checked) {
                 uceYearField.disabled = false;
-                uceYearField.required = true;
+                uceYearField.required = false;
             } else {
-                uceYearField.disabled = true;
+                uceYearField.disabled = false;
                 uceYearField.required = false;
                 uceYearField.value = '';
             }
@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleUACEChange() {
             if (uaceYesRadio && uaceYesRadio.checked) {
                 uaceYearField.disabled = false;
-                uaceYearField.required = true;
+                uaceYearField.required = false;
             } else {
-                uaceYearField.disabled = true;
+                uaceYearField.disabled = false;
                 uaceYearField.required = false;
                 uaceYearField.value = '';
             }

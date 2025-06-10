@@ -11,11 +11,12 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django.shortcuts import render
 from .models import *
 from .serializers import *
+from datetime import datetime
 
 # --------------------------------------------
 # User (Admin only)
 # --------------------------------------------
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -29,7 +30,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 # --------------------------------------------
 # Account Application (Public POST)
 # --------------------------------------------
-class AccountApplicationViewSet(viewsets.ReadOnlyModelViewSet):
+class AccountApplicationViewSet(viewsets.ModelViewSet):
     queryset = AccountApplication.objects.all()
     serializer_class = AccountApplicationSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -89,10 +90,10 @@ class AccountApplicationAPIView(APIView):
 # --------------------------------------------
 # Projects (Public Read)
 # --------------------------------------------
-class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
+class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['status', 'is_featured']
     search_fields = ['title', 'description']
@@ -106,17 +107,17 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-class ProjectImageViewSet(viewsets.ReadOnlyModelViewSet):
+class ProjectImageViewSet(viewsets.ModelViewSet):
     queryset = ProjectImage.objects.all()
     serializer_class = ProjectImageSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
 # --------------------------------------------
 # Activities (Public Read)
 # --------------------------------------------
-class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
+class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
 
@@ -133,9 +134,9 @@ class ActivityImageViewSet(viewsets.ModelViewSet):
 # --------------------------------------------
 # Events (Public Read)
 # --------------------------------------------
-class EventViewSet(viewsets.ReadOnlyModelViewSet):
+class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['event_date', 'title']
     ordering = ['-event_date']
@@ -254,3 +255,30 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BirthdayFilterView(APIView):
+    def get(self, request):
+        dob = request.query_params.get('dob')
+        month = request.query_params.get('month')
+        day = request.query_params.get('day')
+
+        queryset = AccountApplication.objects.all()
+
+        if dob:
+            try:
+                date_obj = datetime.strptime(dob, "%Y-%m-%d").date()
+                queryset = queryset.filter(date_of_birth=date_obj)
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif month and day:
+            try:
+                queryset = queryset.filter(date_of_birth__month=int(month), date_of_birth__day=int(day))
+            except ValueError:
+                return Response({"error": "Invalid month/day format. Use integers."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = AccountApplicationSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
