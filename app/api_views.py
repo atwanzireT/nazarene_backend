@@ -11,7 +11,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django.shortcuts import render
 from .models import *
 from .serializers import *
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.utils.timezone import now
+
 
 # --------------------------------------------
 # User (Admin only)
@@ -282,3 +284,23 @@ class BirthdayFilterView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserNotificationsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+
+class MarkNotificationReadView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, notification_id):
+        try:
+            notification = Notification.objects.get(id=notification_id, user=request.user)
+            notification.is_read = True
+            notification.save()
+            return Response({'status': 'success'})
+        except Notification.DoesNotExist:
+            return Response({'error': 'Notification not found'}, status=404)

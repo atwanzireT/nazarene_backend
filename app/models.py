@@ -294,3 +294,20 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject or 'No Subject'}"
+
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('birthday', 'Birthday'),
+        ('event', 'Event'),
+        ('project', 'Project'),
+        ('activity', 'Activity'),
+        ('general', 'General'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='general')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

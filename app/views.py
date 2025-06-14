@@ -9,6 +9,8 @@ from .forms import *
 from .models import *
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 User = get_user_model()
 
@@ -474,3 +476,48 @@ def account_application_create(request):
 
 def account_application_success(request):
     return render(request, 'application_success.html')
+
+
+def generate_notifications():
+    today = now().date()
+    tomorrow = today + timedelta(days=1)
+
+    # Upcoming Events
+    for event in Event.objects.filter(event_date__date=tomorrow, is_open=True):
+        for user in User.objects.filter(is_active=True):
+            Notification.objects.get_or_create(
+                user=user,
+                title=f"Upcoming Event: {event.title}",
+                message=f"The event '{event.title}' is scheduled for {event.event_date.strftime('%Y-%m-%d %H:%M')}.",
+                type='event'
+            )
+
+    # Upcoming Activities
+    for activity in Activity.objects.filter(activity_date=tomorrow):
+        for user in User.objects.filter(is_active=True):
+            Notification.objects.get_or_create(
+                user=user,
+                title=f"Upcoming Activity: {activity.title}",
+                message=f"The activity '{activity.title}' under project '{activity.project.title}' is scheduled for tomorrow.",
+                type='activity'
+            )
+
+    # Ongoing Projects
+    for project in Project.objects.filter(start_date__lte=today, end_date__gte=today):
+        for user in User.objects.filter(is_active=True):
+            Notification.objects.get_or_create(
+                user=user,
+                title=f"Ongoing Project: {project.title}",
+                message=f"The project '{project.title}' is currently ongoing.",
+                type='project'
+            )
+
+    # Birthdays
+    for app in AccountApplication.objects.filter(date_of_birth__month=today.month, date_of_birth__day=today.day):
+        if app.user and app.user.is_active:
+            Notification.objects.get_or_create(
+                user=app.user,
+                title="🎉 Happy Birthday!",
+                message=f"Dear {app.full_first_name}, we wish you a happy birthday today!",
+                type='birthday'
+            )
