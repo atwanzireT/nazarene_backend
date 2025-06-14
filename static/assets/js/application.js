@@ -1,4 +1,4 @@
-// application.js - Fixed version for successful form submission
+// application.js - Fixed version with validation for interests/contributions and UCE/UACE years
 document.addEventListener('DOMContentLoaded', function () {
     let darkMode = false;
     let formData = {};
@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleUCEChange() {
             if (uceYesRadio && uceYesRadio.checked) {
                 uceYearField.disabled = false;
-                uceYearField.required = false;
+                uceYearField.required = true;
             } else {
-                uceYearField.disabled = false;
+                uceYearField.disabled = true;
                 uceYearField.required = false;
                 uceYearField.value = '';
             }
@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleUACEChange() {
             if (uaceYesRadio && uaceYesRadio.checked) {
                 uaceYearField.disabled = false;
-                uaceYearField.required = false;
+                uaceYearField.required = true;
             } else {
-                uaceYearField.disabled = false;
+                uaceYearField.disabled = true;
                 uaceYearField.required = false;
                 uaceYearField.value = '';
             }
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Form submission validation
         if (form) {
             form.addEventListener('submit', function (event) {
-                console.log('Form submission triggered'); // Debug log
+                console.log('Form submission triggered');
                 
                 let isFormValid = true;
                 let errorMessages = [];
@@ -79,9 +79,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 const classesCheckboxes = form.querySelectorAll('input[name="classes_attended"]:checked');
                 if (classesCheckboxes.length === 0) {
                     errorMessages.push('Please select at least one class attended.');
-                    // Navigate to academic tab to show error
-                    const academicTab = new bootstrap.Tab(document.getElementById('academic-tab'));
-                    academicTab.show();
+                    isFormValid = false;
+                }
+
+                // Validate at least one area of interest is selected
+                const interestCheckboxes = form.querySelectorAll('#interests input[name^="mentorship"], #interests input[name^="skill"], #interests input[name^="network"], #interests input[name^="fundraisers"], #interests input[name^="event_planning"], #interests input[name^="cohort"], #interests input[name^="volunteering"]:checked');
+                if (interestCheckboxes.length === 0) {
+                    errorMessages.push('Please select at least one Area of Interest.');
+                    isFormValid = false;
+                }
+
+                // Validate at least one area of contribution is selected
+                const contributionCheckboxes = form.querySelectorAll('#interests input[name^="financial"], #interests input[name^="charitable"], #interests input[name^="alumni_sports"], #interests input[name^="alumni_dinner"], #interests input[name^="events_at_school"], #interests input[name^="all_get_together"]:checked');
+                if (contributionCheckboxes.length === 0) {
+                    errorMessages.push('Please select at least one Area of Contribution.');
+                    isFormValid = false;
+                }
+
+                // Validate UCE/UACE years if applicable
+                if (uceYesRadio && uceYesRadio.checked && !uceYearField.value) {
+                    errorMessages.push('Please enter your UCE Class Year.');
+                    isFormValid = false;
+                }
+
+                if (uaceYesRadio && uaceYesRadio.checked && !uaceYearField.value) {
+                    errorMessages.push('Please enter your UACE Class Year.');
                     isFormValid = false;
                 }
 
@@ -89,9 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const consentCheckbox = document.getElementById('id_consent_given');
                 if (!consentCheckbox || !consentCheckbox.checked) {
                     errorMessages.push('You must agree to the terms and conditions to proceed.');
-                    // Navigate to consent tab to show error
-                    const consentTab = new bootstrap.Tab(document.getElementById('consent-tab'));
-                    consentTab.show();
                     isFormValid = false;
                 }
 
@@ -100,13 +119,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 let firstInvalidField = null;
                 
                 allRequiredFields.forEach(field => {
-                    if (field.disabled) return; // Skip disabled fields
+                    if (field.disabled) return;
                     
                     let fieldValid = true;
                     
                     if (field.type === 'checkbox' && field.name === 'classes_attended') {
-                        // Already validated above
-                        return;
+                        return; // Already validated above
                     } else if (field.type === 'checkbox') {
                         fieldValid = field.checked;
                     } else if (field.type === 'radio') {
@@ -147,12 +165,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                     
-                    showErrorMessage(errorMessages.length > 0 ? errorMessages.join(' ') : 'Please correct the errors and try again.');
+                    // If we have specific error messages, show them
+                    if (errorMessages.length > 0) {
+                        showErrorMessage(errorMessages.join(' '));
+                    } else {
+                        showErrorMessage('Please correct the errors and try again.');
+                    }
                     return false;
                 }
 
                 // If we reach here, form is valid
-                console.log('Form is valid, proceeding with submission'); // Debug log
+                console.log('Form is valid, proceeding with submission');
                 form.classList.add('was-validated');
                 
                 // Show loading state on submit button
@@ -210,6 +233,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
+            // Special validation for interests tab
+            if (tabContent.id === 'interests') {
+                // Check at least one interest is selected
+                const interestCheckboxes = tabContent.querySelectorAll('input[name^="mentorship"], input[name^="skill"], input[name^="network"], input[name^="fundraisers"], input[name^="event_planning"], input[name^="cohort"], input[name^="volunteering"]:checked');
+                if (interestCheckboxes.length === 0) {
+                    isValid = false;
+                    showErrorMessage('Please select at least one Area of Interest.');
+                }
+
+                // Check at least one contribution is selected
+                const contributionCheckboxes = tabContent.querySelectorAll('input[name^="financial"], input[name^="charitable"], input[name^="alumni_sports"], input[name^="alumni_dinner"], input[name^="events_at_school"], input[name^="all_get_together"]:checked');
+                if (contributionCheckboxes.length === 0) {
+                    isValid = false;
+                    showErrorMessage('Please select at least one Area of Contribution.');
+                }
+            }
+
             return isValid;
         }
 
@@ -246,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const currentTabContent = document.querySelector('.tab-pane.active');
 
                 if (currentTabContent && !validateCurrentTab(currentTabContent)) {
-                    showErrorMessage('Please fill in all required fields before proceeding.');
                     return;
                 }
 
@@ -310,7 +349,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Handle house dropdown default selection
         const houseSelect = document.getElementById('id_house');
         if (houseSelect && !houseSelect.value) {
-            // Don't set a default value, let user choose
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Select House';
