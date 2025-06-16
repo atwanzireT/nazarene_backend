@@ -1,4 +1,4 @@
-// application.js - Fixed version with validation for interests/contributions and UCE/UACE years
+// application.js - Updated version with all fields enabled and relaxed UCE/UACE validation
 document.addEventListener('DOMContentLoaded', function () {
     let darkMode = false;
     let formData = {};
@@ -31,41 +31,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const uaceNoRadio = document.getElementById('id_sat_uace_no');
         const uceYearField = document.getElementById('id_uce_class_year');
         const uaceYearField = document.getElementById('id_uace_class_year');
+        
+        // Ensure year fields are always enabled
+        if (uceYearField) uceYearField.disabled = false;
+        if (uaceYearField) uaceYearField.disabled = false;
 
-        function handleUCEChange() {
-            if (uceYesRadio && uceYesRadio.checked) {
-                uceYearField.disabled = false;
-                uceYearField.required = true;
-            } else {
-                uceYearField.disabled = true;
-                uceYearField.required = false;
-                uceYearField.value = '';
-            }
-        }
-
-        function handleUACEChange() {
-            if (uaceYesRadio && uaceYesRadio.checked) {
-                uaceYearField.disabled = false;
-                uaceYearField.required = true;
-            } else {
-                uaceYearField.disabled = true;
-                uaceYearField.required = false;
-                uaceYearField.value = '';
-            }
-        }
-
-        // Initialize UCE/UACE handlers
-        if (uceYesRadio && uceNoRadio) {
-            uceYesRadio.addEventListener('change', handleUCEChange);
-            uceNoRadio.addEventListener('change', handleUCEChange);
-            handleUCEChange();
-        }
-
-        if (uaceYesRadio && uaceNoRadio) {
-            uaceYesRadio.addEventListener('change', handleUACEChange);
-            uaceNoRadio.addEventListener('change', handleUACEChange);
-            handleUACEChange();
-        }
+        // Remove any required attributes from year fields
+        if (uceYearField) uceYearField.required = false;
+        if (uaceYearField) uaceYearField.required = false;
 
         // Form submission validation
         if (form) {
@@ -96,17 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     isFormValid = false;
                 }
 
-                // Validate UCE/UACE years if applicable
-                if (uceYesRadio && uceYesRadio.checked && !uceYearField.value) {
-                    errorMessages.push('Please enter your UCE Class Year.');
-                    isFormValid = false;
-                }
-
-                if (uaceYesRadio && uaceYesRadio.checked && !uaceYearField.value) {
-                    errorMessages.push('Please enter your UACE Class Year.');
-                    isFormValid = false;
-                }
-
                 // Validate consent checkbox
                 const consentCheckbox = document.getElementById('id_consent_given');
                 if (!consentCheckbox || !consentCheckbox.checked) {
@@ -114,8 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     isFormValid = false;
                 }
 
-                // Validate all required fields across all tabs
-                const allRequiredFields = form.querySelectorAll('[required]');
+                // Validate all required fields across all tabs (except UCE/UACE years)
+                const allRequiredFields = form.querySelectorAll('[required]:not(#id_uce_class_year):not(#id_uace_class_year)');
                 let firstInvalidField = null;
                 
                 allRequiredFields.forEach(field => {
@@ -203,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tabsArray = Array.from(tabs);
 
         function validateCurrentTab(tabContent) {
-            const requiredFields = tabContent.querySelectorAll('[required]');
+            const requiredFields = tabContent.querySelectorAll('[required]:not(#id_uce_class_year):not(#id_uace_class_year)');
             let isValid = true;
 
             requiredFields.forEach(field => {
