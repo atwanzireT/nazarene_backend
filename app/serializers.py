@@ -30,58 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 # -------------------
-# ACCOUNT APPLICATION
-# -------------------
-
-class AccountApplicationSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    full_name = serializers.SerializerMethodField()
-    age = serializers.SerializerMethodField()
-
-    class Meta:
-        model = AccountApplication
-        exclude = ['created_at', 'updated_at']
-        read_only_fields = ['is_approved']
-        extra_kwargs = {
-            'email': {'validators': []},
-            'consent_given': {
-                'required': True,
-                'error_messages': {
-                    'required': _('You must give consent to proceed.')
-                }
-            }
-        }
-
-    def get_full_name(self, obj):
-        names = [obj.full_first_name, obj.full_middle_name, obj.full_surname]
-        return " ".join(filter(None, names))
-
-    def get_age(self, obj):
-        today = date.today()
-        return today.year - obj.date_of_birth.year - (
-            (today.month, today.day) < (obj.date_of_birth.month, obj.date_of_birth.day)
-        )
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError(_("This email is already registered."))
-        if AccountApplication.objects.filter(email=value).exclude(pk=self.instance.pk if self.instance else None).exists():
-            raise serializers.ValidationError(_("An application with this email already exists."))
-        return value
-
-    def validate(self, data):
-        if data.get('year_left_jonahs') < data.get('year_joined_jonahs'):
-            raise serializers.ValidationError({'year_left_jonahs': _("Year left cannot be before year joined.")})
-        if data.get('sat_uce') and not data.get('uce_class_year'):
-            raise serializers.ValidationError({'uce_class_year': _("Please provide the year you sat for UCE.")})
-        if data.get('sat_uace') and not data.get('uace_class_year'):
-            raise serializers.ValidationError({'uace_class_year': _("Please provide the year you sat for UACE.")})
-        if not data.get('consent_given'):
-            raise serializers.ValidationError({'consent_given': _("You must give consent to proceed.")})
-        return data
-
-
-# -------------------
 # PROJECTS & ACTIVITIES
 # -------------------
 

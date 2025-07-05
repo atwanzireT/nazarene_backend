@@ -8,17 +8,13 @@ urlpatterns = [
 
     # User management
     path('users/', views.user_list, name='user_list'),
-    path('register-user/', views.register_user, name='register_user'),
     path('login-activities/', views.user_login_activities, name='login_activities'),
 
     # Account Applications
-    path('account-application/create/', views.account_application_create, name='account_application_create'),
     path('account-applications/', views.account_application_list, name='account_application_list'),
     path('account-application/<int:application_id>/', views.account_application_detail, name='account_application_detail'),
-    path('apply-account/', views.apply_account, name='apply_account'),
     path('applications/<int:application_id>/approve/', views.approve_account_application, name='approve_application'),
-    path('account-applications/success/', views.account_application_success, name='account-application-success'),
-
+ 
     # Projects and Activities
     path('projects/', views.project_list, name='project_list'),
     path('create-project/', views.create_project, name='create_project'),

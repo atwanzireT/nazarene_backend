@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.conf import settings
-from django.utils.crypto import get_random_string
 from .forms import *
 from .models import *
+from accounts.models import AccountApplication
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from datetime import datetime, timedelta
@@ -90,29 +89,6 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
-
-@admin_required
-def register_user(request):
-    if request.method == 'POST':
-        form = UserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = UserForm()
-    return render(request, 'register.html', {'form': form})
-
-
-@admin_required
-def apply_account(request):
-    if request.method == 'POST':
-        form = AccountApplicationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = AccountApplicationForm()
-    return render(request, 'apply_account.html', {'form': form})
 
 
 @admin_required
@@ -313,37 +289,14 @@ def approve_account_application(request, application_id):
         return redirect('account_application_list')
 
     if User.objects.filter(email=application.email).exists():
-        messages.error(request, "A user with this email already exists.")
+        application.user = user
+        application.is_approved = True
+        application.save()
         return redirect('account_application_list')
 
-    # Generate random password
-    password = get_random_string(10)
-
-    # Create user
-    user = User.objects.create_user(
-        username=application.email,
-        email=application.email,
-        full_name=f"{application.full_first_name} {application.full_surname}",
-        phone_number=application.mobile_phone_1,
-        role=User.Role.BASIC_USER,
-        is_approved=True,
-    )
-    user.set_password(password)
-    user.save()
-
-    # Link application to the new user
-    application.user = user
-    application.is_approved = True
-    application.save()
-
-    # Prepare email content
     html_content = (
         f"<p>Hi {application.full_first_name},</p>"
-        f"<p>Your alumni account has been created.</p>"
-        f"<ul>"
-        f"<li><strong>Email:</strong> {application.email}</li>"
-        f"<li><strong>Password:</strong> {password}</li>"
-        f"</ul>"
+        f"<p>Your alumni account profile has been updated"
         f"<p>Please log in and change your password.</p>"
         f"<p>Welcome aboard!</p>"
     )
@@ -368,6 +321,8 @@ def approve_account_application(request, application_id):
         messages.error(request, f"Account created, but failed to send email: {e}")
 
     return redirect('account_application_list')
+
+
 
 # Image upload view
 @admin_required
@@ -413,111 +368,3 @@ def add_activity_image(request, activity_id):
     else:
         form = ActivityImageForm()
     return render(request, 'add_activity_image.html', {'form': form, 'activity': activity})
-
-
-
-
-def account_application_create(request):
-    if request.method == 'POST':
-        form = AccountApplicationForm(request.POST)
-        
-        if form.is_valid():
-            try:
-                app = form.save()
-
-                # Send emails
-                sg = SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-
-                # Admin notification email
-                admin_email = Mail(
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to_emails=settings.ADMIN_EMAIL,
-                    subject='New Account Application Submitted',
-                    plain_text_content=(
-                        f'New application from {app.full_first_name} {app.full_surname}\n'
-                        f'Email: {app.email}\nPhone: {app.mobile_phone_1}\n'
-                        f'Year Joined: {app.year_joined_jonahs}\n'
-                        f'House: {app.house}\n'
-                        f'Classes Attended: {app.classes_attended}'
-                    )
-                )
-                sg.send(admin_email)
-
-                # Applicant confirmation email
-                applicant_email = Mail(
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to_emails=app.email,
-                    subject='Application Received - The Nazarene Alumni Association',
-                    plain_text_content=(
-                        f'Dear {app.full_first_name},\n\n'
-                        f'Thank you for submitting your application to The Nazarene Alumni Association. '
-                        f'We have received your application and will review it shortly.\n\n'
-                        f'You will be contacted once your application has been processed.\n\n'
-                        f'Best regards,\nThe Nazarene Alumni Association'
-                    )
-                )
-                sg.send(applicant_email)
-
-                messages.success(request, "Application submitted successfully! You will receive a confirmation email shortly.")
-                return redirect('account-application-success')
-
-            except Exception as e:
-                print(f"Error processing application: {e}")  # Log the error
-                messages.warning(request, f"Application saved, but there was an issue with email notifications. We will contact you soon.")
-                return redirect('account-application-success')
-        else:
-            # Form has validation errors
-            messages.error(request, "Please correct the errors below and try again.")
-            print("Form errors:", form.errors)  # Debug print
-    else:
-        form = AccountApplicationForm()
-
-    return render(request, 'application_form.html', {'form': form})
-
-def account_application_success(request):
-    return render(request, 'application_success.html')
-
-
-def generate_notifications():
-    today = now().date()
-    tomorrow = today + timedelta(days=1)
-
-    # Upcoming Events
-    for event in Event.objects.filter(event_date__date=tomorrow, is_open=True):
-        for user in User.objects.filter(is_active=True):
-            Notification.objects.get_or_create(
-                user=user,
-                title=f"Upcoming Event: {event.title}",
-                message=f"The event '{event.title}' is scheduled for {event.event_date.strftime('%Y-%m-%d %H:%M')}.",
-                type='event'
-            )
-
-    # Upcoming Activities
-    for activity in Activity.objects.filter(activity_date=tomorrow):
-        for user in User.objects.filter(is_active=True):
-            Notification.objects.get_or_create(
-                user=user,
-                title=f"Upcoming Activity: {activity.title}",
-                message=f"The activity '{activity.title}' under project '{activity.project.title}' is scheduled for tomorrow.",
-                type='activity'
-            )
-
-    # Ongoing Projects
-    for project in Project.objects.filter(start_date__lte=today, end_date__gte=today):
-        for user in User.objects.filter(is_active=True):
-            Notification.objects.get_or_create(
-                user=user,
-                title=f"Ongoing Project: {project.title}",
-                message=f"The project '{project.title}' is currently ongoing.",
-                type='project'
-            )
-
-    # Birthdays
-    for app in AccountApplication.objects.filter(date_of_birth__month=today.month, date_of_birth__day=today.day):
-        if app.user and app.user.is_active:
-            Notification.objects.get_or_create(
-                user=app.user,
-                title="🎉 Happy Birthday!",
-                message=f"Dear {app.full_first_name}, we wish you a happy birthday today!",
-                type='birthday'
-            )
