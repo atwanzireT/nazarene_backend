@@ -1,24 +1,36 @@
 from django.shortcuts import render, redirect
-from .forms import *
-from django.core.mail import send_mail
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 from django.contrib import messages
 from django.conf import settings
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import login, logout, get_user_model
+from .forms import CustomUserCreationForm, AccountApplicationForm
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import CustomUserCreationForm
+
+
+# views.py
 
 def signup_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Log the user in if you want
+            # You can uncomment the login line if you want to log the user in immediately
             # login(request, user)
+            messages.success(request, 'Account created successfully! Please log in.')
             return redirect('https://www.thenazarenejonahsalumni.com/login')
+        else:
+            # If form is invalid, we'll handle the errors in the template
+            pass
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+
+def account_application_success(request):
+    return render(request, 'registration/signup_success.html')
 
 def apply_account(request):
     if request.method == 'POST':
