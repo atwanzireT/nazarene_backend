@@ -117,7 +117,7 @@ class AccountApplicationForm(forms.ModelForm):
     mobile_phone_1 = PhoneNumberField(
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150',
-            'placeholder': '+256712345678'
+            'placeholder': '+256...'
         }),
         required=True,
         help_text="Primary contact number in international format."
@@ -126,7 +126,7 @@ class AccountApplicationForm(forms.ModelForm):
     mobile_phone_2 = PhoneNumberField(
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150',
-            'placeholder': '+256772345678'
+            'placeholder': '+256...'
         }),
         required=False,
         help_text="Optional secondary contact number."
